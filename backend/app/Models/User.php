@@ -53,4 +53,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Task::class);
     }
+
+    public function taskDays(): HasMany
+    {
+        return $this->hasMany(TaskDay::class);
+    }
 }
