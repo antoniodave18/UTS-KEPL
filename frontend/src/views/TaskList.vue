@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import api from '../api/axios'
 
@@ -182,7 +182,14 @@ async function logout() {
   }
 }
 
-onMounted(load)
+onMounted(() => {
+  load()
+  window.addEventListener('focus', load)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('focus', load)
+})
 </script>
 
 <template>

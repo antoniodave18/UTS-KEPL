@@ -32,6 +32,13 @@ class TaskController extends Controller
             ],
         ]);
 
+        if (! isset($data['task_day_id'])) {
+            $day = $request->user()->taskDays()->firstOrCreate([
+                'date' => now()->toDateString(),
+            ]);
+            $data['task_day_id'] = $day->id;
+        }
+
         return response()->json($request->user()->tasks()->create($data), 201);
     }
 

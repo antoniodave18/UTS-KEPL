@@ -39,6 +39,29 @@ class TaskTest extends TestCase
             ->assertJsonMissing(['title' => 'Milik Ani']);
     }
 
+    public function test_task_created_without_day_is_assigned_to_today(): void
+    {
+        $user = User::create([
+            'name' => 'Budi', 'email' => 'budi@test.com', 'password' => 'secret123',
+        ]);
+        Sanctum::actingAs($user);
+
+        $response = $this->postJson('/api/tasks', ['title' => 'Tugas dari Postman'])
+            ->assertCreated()
+            ->assertJsonFragment(['title' => 'Tugas dari Postman']);
+
+        $dayId = $response->json('task_day_id');
+
+        $this->assertDatabaseHas('task_days', [
+            'id' => $dayId,
+            'user_id' => $user->id,
+            'date' => now()->toDateString(),
+        ]);
+        $this->getJson("/api/tasks?day_id={$dayId}")
+            ->assertOk()
+            ->assertJsonFragment(['title' => 'Tugas dari Postman']);
+    }
+
     public function test_user_cannot_access_other_users_task(): void
     {
         $user = User::create(['name' => 'A', 'email' => 'a@test.com', 'password' => 'secret123']);
